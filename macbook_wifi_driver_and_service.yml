@@ -1,0 +1,44 @@
+---
+- name: Configure txpower for wireless interface
+  hosts: localhost
+  become: yes
+
+  tasks:
+    - name: Check Wi-Fi card PCI ID
+      shell: lspci -nn | grep -i '14e4:43ba'
+      register: wifi_card_check
+      ignore_errors: yes
+
+    - name: Fail if the required Wi-Fi card is not present
+      fail:
+        msg: "Required Wi-Fi card with PCI ID 14e4:43ba is not present."
+      when: wifi_card_check.rc != 0
+
+    - name: Create systemd service file for setting txpower
+      copy:
+        dest: /etc/systemd/system/txpower.service
+        content: |
+          [Unit]
+          Description=Set TX Power for Wireless Interface
+          After=network-online.target
+          Wants=network-online.target
+
+          [Service]
+          Type=oneshot
+          ExecStart=/sbin/iwconfig wlp3s0 txpower 10dBm
+          RemainAfterExit=true
+
+          [Install]
+          WantedBy=multi-user.target
+      when: wifi_card_check.rc == 0
+
+    - name: Reload systemd manager configuration
+      command: systemctl daemon-reload
+      when: wifi_card_check.rc == 0
+
+    - name: Enable the txpower service
+      systemd:
+        name: txpower
+        enabled: yes
+        state: started
+      when: wifi_card_check.rc == 0
