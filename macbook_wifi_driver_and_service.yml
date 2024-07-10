@@ -3,7 +3,7 @@
 
 
 - name: Install txpower init service for wireless interface (mitigating driver init problem)
-  hosts: local
+  hosts: all
   become: yes
 
   tasks:
@@ -45,7 +45,7 @@
         enabled: yes
         state: started
       when: wifi_card_check.rc != 0
-      
+
     - name: Restart Wi-Fi service
       service:
         name: NetworkManager
