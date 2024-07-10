@@ -17,6 +17,15 @@
         msg: "Required Wi-Fi card with PCI ID 14e4:43ba is not present."
       when: wifi_card_check.rc != 0
 
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install firmware-b43legacy-installer package
+      apt:
+        name: firmware-b43legacy-installer
+        state: present
+
     - name: Create systemd service file for setting txpower
       copy:
         dest: /etc/systemd/system/wifi-txpower-init.service
