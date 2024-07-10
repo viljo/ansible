@@ -1,25 +1,28 @@
 ---
-- name: Configure txpower for wireless interface
-  hosts: localhost
+
+
+
+- name: Install txpower init service for wireless interface (mitigating driver init problem)
+  hosts: local
   become: yes
 
   tasks:
-    - name: Check Wi-Fi card PCI ID
+    - name: Check thats Wi-Fi card PCI ID exists
       shell: lspci -nn | grep -i '14e4:43ba'
       register: wifi_card_check
       ignore_errors: yes
 
-    - name: Fail if the required Wi-Fi card is not present
+    - name: Hardware verified
       fail:
         msg: "Required Wi-Fi card with PCI ID 14e4:43ba is not present."
       when: wifi_card_check.rc != 0
 
     - name: Create systemd service file for setting txpower
       copy:
-        dest: /etc/systemd/system/txpower.service
+        dest: /etc/systemd/system/wifi-txpower-init.service
         content: |
           [Unit]
-          Description=Set TX Power for Wireless Interface
+          Description=Set TX Power for Wireless Interface once at init
           After=network-online.target
           Wants=network-online.target
 
@@ -36,9 +39,15 @@
       command: systemctl daemon-reload
       when: wifi_card_check.rc == 0
 
-    - name: Enable the txpower service
+    - name: Enable the wifi-txpower-init service
       systemd:
-        name: txpower
+        name: wifi-txpower-init
         enabled: yes
         state: started
+      when: wifi_card_check.rc != 0
+      
+    - name: Restart Wi-Fi service
+      service:
+        name: NetworkManager
+        state: restarted
       when: wifi_card_check.rc == 0
