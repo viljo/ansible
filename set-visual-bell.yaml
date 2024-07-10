@@ -1,0 +1,18 @@
+---
+- name: Set prefer-visible-bell option for the current user
+  hosts: localhost
+  become: false
+  tasks:
+    - name: Ensure user inputrc exists
+      file:
+        path: "{{ ansible_env.HOME }}/.inputrc"
+        state: touch
+        mode: '0644'
+
+    - name: Set prefer-visible-bell in user inputrc
+      lineinfile:
+        path: "{{ ansible_env.HOME }}/.inputrc"
+        regexp: '^set prefer-visible-bell'
+        line: 'set prefer-visible-bell on'
+        state: present
+        create: yes
