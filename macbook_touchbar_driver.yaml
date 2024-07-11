@@ -1,0 +1,50 @@
+---
+- name: Install Apple SPI Driver on Ubuntu
+  hosts: all
+  become: yes
+  tasks:
+    - name: Ensure system is updated
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Append modules to initramfs-tools/modules
+      lineinfile:
+        path: /etc/initramfs-tools/modules
+        line: "{{ item }}"
+        create: yes
+      with_items:
+        - "# applespi"
+        - "applespi"
+        - "spi_pxa2xx_platform"
+        - "intel_lpss_pci"
+
+    - name: Update initramfs
+      command: update-initramfs -u
+      args:
+        warn: no
+
+    - name: Install DKMS package
+      apt:
+        name: dkms
+        state: present
+
+    - name: Clone Apple SPI Driver repository
+      git:
+        #repo: 'https://github.com/roadrunner2/macbook12-spi-driver.git'
+        # Using a pullrequest with fix for newer kernals
+        repo: 'https://github.com/almas/macbook12-spi-driver.git'
+        dest: '/usr/src/applespi-0.1'
+        version: 'HEAD'
+
+    - name: Install Apple SPI Driver using DKMS
+      command: dkms install -m applespi -v 0.1
+      args:
+        warn: no
+
+    - name: Reboot the system
+      reboot:
+        msg: "Reboot initiated by Ansible for Apple SPI Driver installation"
+        pre_reboot_delay: 60
+        post_reboot_delay: 120
+        reboot_timeout: 1800
