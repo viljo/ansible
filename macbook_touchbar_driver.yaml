@@ -42,6 +42,35 @@
       args:
         warn: no
 
+    - name: Create systemd service to re-enable MacBook TouchBar (bugfix)
+      copy:
+        dest: /etc/systemd/system/re-enable-touchbar.service
+        content: |
+          [Unit]
+          Description=Re-enable MacBook 14,3 TouchBar
+          Before=display-manager.service
+
+          [Service]
+          Type=oneshot
+          ExecStartPre=/bin/sleep 2
+          ExecStart=/bin/sh -c "echo '1-3' > /sys/bus/usb/drivers/usb/unbind"
+          ExecStart=/bin/sh -c "echo '1-3' > /sys/bus/usb/drivers/usb/bind"
+          RemainAfterExit=yes
+          TimeoutSec=0
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Reload systemd daemon
+      systemd:
+        daemon_reload: yes
+
+    - name: Enable the re-enable-touchbar service
+      systemd:
+        name: re-enable-touchbar.service
+        enabled: yes
+        state: started
+
     - name: Reboot the system
       reboot:
         msg: "Reboot initiated by Ansible for Apple SPI Driver installation"
