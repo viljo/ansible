@@ -37,6 +37,7 @@
 
           [Service]
           Type=oneshot
+          ExecStartPre=timeout 60s bash -c 'until lsmod | grep -q brcmfmac; do sleep 1; done'
           ExecStart=/sbin/iwconfig wlp3s0 txpower 10dBm
           RemainAfterExit=true
 
