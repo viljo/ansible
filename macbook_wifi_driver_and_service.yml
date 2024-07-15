@@ -32,13 +32,12 @@
         content: |
           [Unit]
           Description=Set TX Power for Wireless Interface once at init
-          After=network-online.target
-          Wants=network-online.target
+          After=network.target
 
           [Service]
           Type=oneshot
-          ExecStartPre=timeout 60s bash -c 'until lsmod | grep -q brcmfmac; do sleep 1; done'
           ExecStart=/sbin/iwconfig wlp3s0 txpower 10dBm
+          ExecStartPost=bash -c 'sleep 1; ifconfig wlp3s0 down; sleep 1; ifconfig wlp3s0 up'
           RemainAfterExit=true
 
           [Install]
