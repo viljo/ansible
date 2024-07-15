@@ -52,7 +52,7 @@
 
           [Service]
           Type=oneshot
-          ExecStartPre=/bin/sleep 2
+          ExecStartPre=timeout 60s bash -c 'until lsmod | grep -q applespi; do sleep 1; done'
           ExecStart=/bin/sh -c "echo '1-3' > /sys/bus/usb/drivers/usb/unbind"
           ExecStart=/bin/sh -c "echo '1-3' > /sys/bus/usb/drivers/usb/bind"
           RemainAfterExit=yes
