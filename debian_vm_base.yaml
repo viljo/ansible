@@ -1,5 +1,5 @@
 ---
-- name: Create a minimal Debian Bookworm VM
+- name: Create and verify a minimal Debian Bookworm VM
   hosts: debian_vm_host
   become: yes
   vars:
@@ -12,6 +12,21 @@
     ip_address: "192.168.10.2"
 
   tasks:
+    - name: Check if VM is already running
+      command: "virsh domstate {{ vm_name }}"
+      register: vm_state
+      failed_when: false
+      changed_when: false
+
+    - name: Set fact if VM is running
+      set_fact:
+        vm_running: "{{ vm_state.stdout == 'running' }}"
+
+    - name: Skip VM creation if already running
+      debug:
+        msg: "VM is already running. Skipping creation steps."
+      when: vm_running
+
     - name: Check if Debian Bookworm ISO exists
       stat:
         path: "{{ iso_path }}"
@@ -22,7 +37,7 @@
         url: "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.6.0-amd64-netinst.iso"
         dest: "{{ iso_path }}"
         mode: '0644'
-      when: not iso_path_stat.stat.exists
+      when: not iso_path_stat.stat.exists and not vm_running
 
     - name: Copy preseed file
       copy:
@@ -37,7 +52,8 @@
 
           d-i netcfg/choose_interface select auto
           d-i netcfg/get_hostname string debian-vm
-          d-i netcfg/get_domain string unassigned-domain
+          d-i netcfg/get_domain string unassigned-
+          d-i netcfg/use_autoconfig boolean false
           d-i netcfg/get_ipaddress string {{ ip_address }}
           d-i netcfg/get_netmask string 255.255.255.0
           d-i netcfg/get_gateway string 192.168.10.1
@@ -49,11 +65,14 @@
           d-i mirror/http/directory string /debian
           d-i mirror/http/proxy string
 
+          d-i apt-setup/use_mirror boolean false
+          d-i apt-setup/no_mirror boolean true
+
           d-i clock-setup/utc boolean true
           d-i time/zone string UTC
           d-i clock-setup/ntp boolean true
 
-          d-i partman-auto/method string lvm
+          d-i partman-auto/method string regular
           d-i partman-lvm/device_remove_lvm boolean true
           d-i partman-md/device_remove_md boolean true
           d-i partman-lvm/confirm boolean true
@@ -82,7 +101,7 @@
           d-i partman/confirm boolean true
           d-i partman/confirm_nooverwrite boolean true
 
-          tasksel tasksel/first multiselect standard, ssh-server
+          tasksel tasksel/first multiselect ssh-server
 
           popularity-contest popularity-contest/participate boolean false
 
@@ -109,13 +128,15 @@
           d-i debian-installer/add-kernel-opts string console=ttyS0,115200n8
         dest: "{{ preseed_path }}"
         mode: '0644'
+      when: not vm_running
 
     - name: Create VM disk
       command: "qemu-img create -f qcow2 {{ disk_path }} 10G"
       args:
         creates: "{{ disk_path }}"
+      when: not vm_running
 
-    - name: Define the VM
+    - name: Define and install the VM
       command: >
         virt-install
         --name {{ vm_name }}
@@ -129,26 +150,34 @@
         --console pty,target_type=serial
         --location {{ iso_path }}
         --initrd-inject {{ preseed_path }}
-        #--extra-args "auto=true priority=critical preseed/file=/preseed.cfg console=ttyS0,115200n8"
+        --extra-args "auto=true priority=critical preseed/file=/preseed.cfg console=ttyS0,115200n8"
         --noautoconsole
+        --wait=-1
       register: vm_creation
       ignore_errors: true
-
-    - name: Ensure the VM is running
-      command: "virsh start {{ vm_name }}"
-      when: vm_creation.failed
+      when: not vm_running
 
     - name: Set VM to autostart
       command: "virsh autostart {{ vm_name }}"
+      when: not vm_running
+   
+    - name: Get the guest IP address
+      shell: ip neighbor | grep -i "{{ mac_address }}" | cut -d" " -f1
+      register: guest_ip
+      retries: 10
+      delay: 5
+      until: guest_ip.stdout != ""
+
+    - name: Ip address found
+      debug:
+        msg: "Host with MAC:{{ mac_address }} has IP: {{guest_ip.stdout}}"
+      when: guest_ip.stdout != ""
 
     - name: Wait for SSH to become available
       wait_for:
-        host: "{{ ip_address }}"
+        host: "{{ guest_ip.stdout }}"
         port: 22
-        delay: 30
-        timeout: 300
+        delay: 5
+        timeout: 30
         state: started
 
-    - name: Verify SSH connectivity
-      ping:
-      delegate_to: "{{ ip_address }}"
