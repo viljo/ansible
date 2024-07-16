@@ -1,0 +1,35 @@
+---
+#install linux-source-6.8.0
+- name: Install necessary packages and set up Cirrus HDA audio driver
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install required packages
+      apt:
+        name:
+          - wget
+          - make
+          - gcc
+          - linux-headers-generic
+        state: present
+
+    - name: Install Linux source package
+      apt:
+        name: "linux-source-{{ ansible_kernel | regex_replace('-(.*)', '') }}"
+        state: present
+        update_cache: yes
+
+    - name: Clone snd_hda_macbookpro repository
+      git:
+        repo: https://github.com/davidjo/snd_hda_macbookpro.git
+        dest: /tmp/snd_hda_macbookpro
+
+    - name: Change directory to snd_hda_macbookpro and run install script
+      command: ./install.cirrus.driver.sh
+      args:
+        chdir: /tmp/snd_hda_macbookpro
+
