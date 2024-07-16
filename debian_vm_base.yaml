@@ -129,7 +129,7 @@
         --console pty,target_type=serial
         --location {{ iso_path }}
         --initrd-inject {{ preseed_path }}
-        --extra-args "auto=true priority=critical preseed/file=/preseed.cfg console=ttyS0,115200n8"
+        #--extra-args "auto=true priority=critical preseed/file=/preseed.cfg console=ttyS0,115200n8"
         --noautoconsole
       register: vm_creation
       ignore_errors: true
