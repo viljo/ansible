@@ -1,0 +1,154 @@
+---
+- name: Create a minimal Debian Bookworm VM
+  hosts: debian_vm_host
+  become: yes
+  vars:
+    vm_name: "debian_bookworm"
+    mac_address: "{{ hostvars['debian_vm'].mac_address }}"
+    disk_path: "/var/lib/libvirt/images/debian_bookworm.qcow2"
+    iso_path: "/var/lib/libvirt/boot/debian-12.6.0-amd64-netinst.iso"
+    preseed_path: "/var/lib/libvirt/boot/preseed.cfg"
+    network_name: "default"
+    ip_address: "192.168.10.2"
+
+  tasks:
+    - name: Check if Debian Bookworm ISO exists
+      stat:
+        path: "{{ iso_path }}"
+      register: iso_path_stat
+
+    - name: Download Debian Bookworm ISO
+      get_url:
+        url: "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.6.0-amd64-netinst.iso"
+        dest: "{{ iso_path }}"
+        mode: '0644'
+      when: not iso_path_stat.stat.exists
+
+    - name: Copy preseed file
+      copy:
+        content: |
+          # Preseed file for Debian installation
+          d-i debian-installer/language string en
+          d-i debian-installer/country string US
+          d-i debian-installer/locale string en_US.UTF-8
+
+          d-i console-setup/ask_detect boolean false
+          d-i keyboard-configuration/xkb-keymap select us
+
+          d-i netcfg/choose_interface select auto
+          d-i netcfg/get_hostname string debian-vm
+          d-i netcfg/get_domain string unassigned-domain
+          d-i netcfg/get_ipaddress string {{ ip_address }}
+          d-i netcfg/get_netmask string 255.255.255.0
+          d-i netcfg/get_gateway string 192.168.10.1
+          d-i netcfg/get_nameservers string 8.8.8.8
+          d-i netcfg/confirm_static boolean true
+
+          d-i mirror/country string manual
+          d-i mirror/http/hostname string deb.debian.org
+          d-i mirror/http/directory string /debian
+          d-i mirror/http/proxy string
+
+          d-i clock-setup/utc boolean true
+          d-i time/zone string UTC
+          d-i clock-setup/ntp boolean true
+
+          d-i partman-auto/method string lvm
+          d-i partman-lvm/device_remove_lvm boolean true
+          d-i partman-md/device_remove_md boolean true
+          d-i partman-lvm/confirm boolean true
+          d-i partman-lvm/confirm_nooverwrite boolean true
+          d-i partman-auto/choose_recipe select atomic
+          d-i partman-auto/expert_recipe string                         \
+              boot-root ::                                              \
+                      40 50 100 ext4                                    \
+                              $primary{ } $bootable{ }                  \
+                              method{ format } format{ }                \
+                              use_filesystem{ } filesystem{ ext4 }      \
+                              mountpoint{ /boot }                       \
+                      .                                                 \
+                      500 10000 -1 ext4                                 \
+                              method{ format } format{ }                \
+                              use_filesystem{ } filesystem{ ext4 }      \
+                              mountpoint{ / }                           \
+                      .                                                 \
+                      64 512 300% linux-swap                            \
+                              method{ swap } format{ }                  \
+                      .                                                 \
+              .
+
+          d-i partman/confirm_write_new_label boolean true
+          d-i partman/choose_partition select finish
+          d-i partman/confirm boolean true
+          d-i partman/confirm_nooverwrite boolean true
+
+          tasksel tasksel/first multiselect standard, ssh-server
+
+          popularity-contest popularity-contest/participate boolean false
+
+          d-i passwd/root-login boolean false
+          d-i passwd/make-user boolean true
+          d-i passwd/user-fullname string Anders
+          d-i passwd/username string anders
+          d-i passwd/user-password password changeme
+          d-i passwd/user-password-again password changeme
+
+          d-i user-setup/allow-password-weak boolean true
+
+          d-i pkgsel/include string openssh-server
+
+          d-i grub-installer/only_debian boolean true
+          d-i grub-installer/with_other_os boolean false
+          d-i grub-installer/bootdev string /dev/vda
+
+          d-i finish-install/reboot_in_progress note
+          d-i debian-installer/exit/poweroff boolean false
+          d-i debian-installer/exit/reboot boolean true
+
+          # Ensure the system boots to a serial console
+          d-i debian-installer/add-kernel-opts string console=ttyS0,115200n8
+        dest: "{{ preseed_path }}"
+        mode: '0644'
+
+    - name: Create VM disk
+      command: "qemu-img create -f qcow2 {{ disk_path }} 10G"
+      args:
+        creates: "{{ disk_path }}"
+
+    - name: Define the VM
+      command: >
+        virt-install
+        --name {{ vm_name }}
+        --ram 1024
+        --vcpus 1
+        --disk path={{ disk_path }},format=qcow2
+        --os-type linux
+        --os-variant debian12
+        --network network={{ network_name }},mac={{ mac_address }}
+        --graphics none
+        --console pty,target_type=serial
+        --location {{ iso_path }}
+        --initrd-inject {{ preseed_path }}
+        --extra-args "auto=true priority=critical preseed/file=/preseed.cfg console=ttyS0,115200n8"
+        --noautoconsole
+      register: vm_creation
+      ignore_errors: true
+
+    - name: Ensure the VM is running
+      command: "virsh start {{ vm_name }}"
+      when: vm_creation.failed
+
+    - name: Set VM to autostart
+      command: "virsh autostart {{ vm_name }}"
+
+    - name: Wait for SSH to become available
+      wait_for:
+        host: "{{ ip_address }}"
+        port: 22
+        delay: 30
+        timeout: 300
+        state: started
+
+    - name: Verify SSH connectivity
+      ping:
+      delegate_to: "{{ ip_address }}"

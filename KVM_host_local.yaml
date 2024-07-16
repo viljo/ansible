@@ -1,0 +1,31 @@
+---
+- name: Install KVM and setup local KVM host
+  hosts: debian_vm_host
+  become: yes
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install KVM packages
+      apt:
+        name:
+          - qemu-kvm
+          - libvirt-daemon-system
+          - libvirt-clients
+          - bridge-utils
+          - virtinst
+          - virt-manager
+        state: present
+
+    - name: Enable and start libvirtd
+      systemd:
+        name: libvirtd
+        enabled: yes
+        state: started
+
+    - name: Add current user to libvirt group
+      user:
+        name: "{{ ansible_user_id }}"
+        groups: libvirt
+        append: yes

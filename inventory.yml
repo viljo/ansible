@@ -1,3 +1,10 @@
 all:
   hosts:
-    localhost
+    debian_vm_host:
+      ansible_host: 127.0.0.1
+    debian_vm:
+      ansible_host: 192.168.10.2
+      mac_address: "52:54:00:12:34:56"
+    debian_vm2:
+      ansible_host: 192.168.10.3
+      mac_address: "52:54:00:12:34:57"
