@@ -11,6 +11,22 @@
     preseed_path: "/var/lib/libvirt/boot/preseed.cfg"
     network_name: "default"
   tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install required packages
+      apt:
+        name:
+          - qemu-kvm
+          - libvirt-daemon-system
+          - libvirt-clients
+          - bridge-utils
+          - virtinst
+          - virt-manager
+          - arp-scan
+        state: present
+
     - name: Check if VM is already running
       command: "virsh domstate {{ vm_name }}"
       register: vm_state
@@ -162,7 +178,8 @@
       when: not vm_running
 
     - name: Get the guest IP address
-      shell: ip neighbor | grep -i "{{ mac_address }}" | sed 1q | cut -d" " -f1
+      #shell: ip neighbor | grep -i "{{ mac_address }}" | sed 1q | cut -d" " -f1
+      shell: arp-scan --interface=virbr0 --localnet | grep 52:54:00:12:34:51  | awk ' { printf $1 } '
       register: guest_ip
       retries: 10
       delay: 5
@@ -177,6 +194,6 @@
       wait_for:
         host: "{{ guest_ip.stdout }}"
         port: 22
-        delay: 5
+        delay: 0
         timeout: 30
         state: started
