@@ -1,10 +1,28 @@
 all:
-  hosts:
-    debian_vm_host:
-      ansible_host: 127.0.0.1
-    debian_vm:
-      ansible_host: 192.168.10.2
-      mac_address: "52:54:00:12:34:56"
-    debian_vm2:
-      ansible_host: 192.168.10.3
-      mac_address: "52:54:00:12:34:57"
+  children:
+    network:
+      hosts:
+        openwrt:
+          ansible_host: 192.168.1.1
+          ansible_user: root
+          ansible_ssh_private_key_file: ~/.ssh/id_rsa
+    virtual_servers:
+      children:
+        debian12_vm:
+          hosts:
+            test_server1:
+              ansible_host: 192.168.10.11
+              mac_address: "52:54:00:12:34:56"
+            test_server2:
+              ansible_host: 192.168.10.12
+              mac_address: "52:54:00:12:34:57"
+    servers:
+      children:
+        vm_servers:
+          hosts:
+            local_vm_host:
+              ansible_host: 127.0.0.1
+    clients:
+      hosts: {}
+    appliances:
+      hosts: {}

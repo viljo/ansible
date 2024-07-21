@@ -1,16 +1,15 @@
 ---
 - name: Create and verify a minimal Debian Bookworm VM
-  hosts: debian_vm_host
+  hosts: debian12_vm
   become: yes
   vars:
-    vm_name: "debian_bookworm"
-    mac_address: "{{ hostvars['debian_vm'].mac_address }}"
-    disk_path: "/var/lib/libvirt/images/debian_bookworm.qcow2"
+    vm_name: "debian12_vm_{{ inventory_hostname }}"
+    mac_address: "{{ hostvars[inventory_hostname].mac_address }}"
+    ip_address: "{{ hostvars[inventory_hostname].ansible_host }}"
+    disk_path: "/var/lib/libvirt/images/debian12_vm_{{ inventory_hostname }}.qcow2"
     iso_path: "/var/lib/libvirt/boot/debian-12.6.0-amd64-netinst.iso"
     preseed_path: "/var/lib/libvirt/boot/preseed.cfg"
     network_name: "default"
-    ip_address: "192.168.10.2"
-
   tasks:
     - name: Check if VM is already running
       command: "virsh domstate {{ vm_name }}"
@@ -161,15 +160,15 @@
     - name: Set VM to autostart
       command: "virsh autostart {{ vm_name }}"
       when: not vm_running
-   
+
     - name: Get the guest IP address
-      shell: ip neighbor | grep -i "{{ mac_address }}" | cut -d" " -f1
+      shell: ip neighbor | grep -i "{{ mac_address }}" | sed 1q | cut -d" " -f1
       register: guest_ip
       retries: 10
       delay: 5
       until: guest_ip.stdout != ""
 
-    - name: Ip address found
+    - name: IP address found
       debug:
         msg: "Host with MAC:{{ mac_address }} has IP: {{guest_ip.stdout}}"
       when: guest_ip.stdout != ""
@@ -181,4 +180,3 @@
         delay: 5
         timeout: 30
         state: started
-
