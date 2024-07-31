@@ -36,12 +36,25 @@
       debug:
         msg: "{{ hosts_with_mac }}"
 
-    - name: Add static DNS entries for all hosts with MAC addresses
-      lineinfile:
-        path: /etc/config/dhcp
-        insertafter: '^config host'
-        line: "{{ '\t' }}option name '{{ item }}'\n{{ '\t' }}option ip '{{ hostvars[item].ansible_host }}'\n{{ '\t' }}option mac '{{ hostvars[item].mac_address }}'\n{{ '\t' }}option dns '1'\n"          
-      loop: "{{ hosts_with_mac }}"
+    - name: Ensure static DNS entries are present for each host
+      block:
+        - name: Check if static entry already exists
+          shell: grep -q "option mac '{{ hostvars[item].mac_address }}'" /etc/config/dhcp && echo "YES" || echo "NO"
+          register: static_entry_check
+          changed_when: false
+          loop: "{{ hosts_with_mac }}"
+          loop_control:
+            loop_var: item
+
+        - name: Add static DNS entry if not present
+          lineinfile:
+            path: /etc/config/dhcp
+            insertafter: '^config host'
+            line: "{{ '\t' }}option name '{{ item }}'\n{{ '\t' }}option ip '{{ hostvars[item].ansible_host }}'\n{{ '\t' }}option mac '{{ hostvars[item].mac_address }}'\n{{ '\t' }}option dns '1'\n"          
+          when: static_entry_check.results[item|int].stdout == "NO"
+          loop: "{{ hosts_with_mac }}"
+          loop_control:
+            loop_var: item
 
     - name: Restart dnsmasq service to apply changes
       service:
