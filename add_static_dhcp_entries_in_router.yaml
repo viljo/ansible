@@ -34,16 +34,22 @@
           loop_control:
             loop_var: item
 
+        - name: Debug static entry check results
+          debug:
+            msg: "{{ item.item }}: {{ item.stdout }}"
+          loop: "{{ static_entry_check.results }}"
+          loop_control:
+            label: "{{ item.item }}"
+
         - name: Add static DNS entry if not present
           lineinfile:
             path: /etc/config/dhcp
-            line: "config host\n{{ '\t' }}option name '{{ item }}'\n{{ '\t' }}option mac '{{ hostvars[item].mac_address }}'\n{{ '\t' }}option ip '{{ hostvars[item].ansible_host }}'\n"          
-          when: static_entry_check.results[item|int].stdout == "NO"
-          loop: "{{ hosts_with_mac }}"
+            line: "config host\n{{ '\t' }}option name '{{ item.item }}'\n{{ '\t' }}option ip '{{ hostvars[item.item].ansible_host }}'\n{{ '\t' }}option mac '{{ hostvars[item.item].mac_address }}'\n{{ '\t' }}option dns '1'\n"
+          when: item.stdout == "NO"
+          loop: "{{ static_entry_check.results }}"
           loop_control:
-            loop_var: item
+            label: "{{ item.item }}"
 
     - name: Restart dnsmasq service to apply changes
-      service:
-        name: dnsmasq
-        state: restarted
+      command: /etc/init.d/dnsmasq restart
+      become: true

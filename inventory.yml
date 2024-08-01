@@ -37,4 +37,70 @@ all:
           ansible_host: 192.168.103.29
           mac_address: "34:CF:F6:FB:05:40"
     appliances:
-      hosts: {}
+      hosts:
+        anders-applewatch:
+          ansible_host: 192.168.0.230
+          mac_address: '3A:12:F4:4F:26:01'
+        anders-macbook-air:
+          ansible_host: 192.168.0.227
+          mac_address: 'F0:18:98:AF:67:3D'
+        tellstick:
+          ansible_host: 192.168.0.124
+          mac_address: 'AC:CA:54:02:2F:CB'
+        chromecast-ultra1:
+          ansible_host: 192.168.0.244
+          mac_address: 'F4:F5:D8:5F:54:64'
+        stella-gaming-laptop:
+          ansible_host: 192.168.0.101
+          mac_address: '80:91:33:06:56:F7'
+        stella-macbook-air:
+          ansible_host: 192.168.0.197
+          mac_address: '50:ED:3C:40:5C:EC'
+        sara-mobil-p20:
+          ansible_host: 192.168.0.178
+          mac_address: '7C:A1:77:3D:9A:DF'
+        stella-mobil-p30:
+          ansible_host: 192.168.0.127
+          mac_address: 'EA:F3:F4:48:3F:B1'
+        ring-floodlight-camera:
+          ansible_host: 192.168.0.167
+          mac_address: '54:E0:19:B2:05:85'
+        shelly-button1:
+          ansible_host: 192.168.0.193
+          mac_address: '98:CD:AC:2C:27:87'
+        shelly-plug-laundry-light:
+          ansible_host: 192.168.0.229
+          mac_address: 'E8:68:E7:6E:93:67'
+        shelly-plug-garage-gate:
+          ansible_host: 192.168.0.196
+          mac_address: 'E8:68:E7:6F:36:AC'
+        printer-hp-m479:
+          ansible_host: 192.168.0.144
+          mac_address: '30:24:A9:5A:98:2E'
+        shelly-plug-coffemachine:
+          ansible_host: 192.168.0.175
+          mac_address: 'E8:68:E7:C1:6A:8B'
+        voron2:
+          ansible_host: 192.168.0.249
+          mac_address: 'E4:5F:01:12:19:4A'
+        chromecast-livingroom:
+          ansible_host: 192.168.0.225
+          mac_address: '54:60:09:34:5A:1E'
+        chromecast-basement:
+          ansible_host: 192.168.0.168
+          mac_address: '54:60:09:18:ED:3C'
+        stella-ipad-pro12:
+          ansible_host: 192.168.0.107
+          mac_address: 'AE:A4:30:05:53:FD'
+        garage-pc-wifi:
+          ansible_host: 192.168.0.219
+          mac_address: '34:CF:F6:FB:05:40'
+        anders-macbook-pro-wifi:
+          ansible_host: 192.168.0.183
+          mac_address: '78:4F:43:7C:21:ED'
+        maya-iphone12-mini:
+          ansible_host: 192.168.0.157
+          mac_address: '76:40:56:31:D9:BE'
+        sara-mobil-jobb:
+          ansible_host: 192.168.0.241
+          mac_address: 'E2:73:20:01:F9:9C'
