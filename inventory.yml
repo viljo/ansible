@@ -3,6 +3,10 @@ all:
     network:
       hosts:
         openwrt-main-router: { ansible_host: 192.168.1.1, ansible_user: root, ansible_ssh_private_key_file: ~/.ssh/id_rsa }
+        deco-wifi-basement: { ansible_host: 192.168.2.10, mac_address: '30:DE:4B:BF:BD:D0' }
+        deco-wifi-M4R-garage: { ansible_host: 192.168.2.11, mac_address: '5C:E9:31:65:A8:F8' }
+        deco-wifi-upstairs: { ansible_host: 192.168.2.12, mac_address: '30:DE:4B:BF:D4:2C' }
+        deco-wifi-X60-office: { ansible_host: 192.168.2.13, mac_address: '30:DE:4B:BF:BE:04' }
     virtual_servers:
       children:
         debian12_vm:
@@ -13,72 +17,79 @@ all:
       children:
         kvm_host:
           hosts:
-            pi-kvm-wifi: { ansible_host: 192.168.101.247, mac_address: "D8:3A:DD:88:24:4D" }
+            pi-kvm-wifi: { ansible_host: 192.168.20.1, mac_address: "D8:3A:DD:88:24:4D" }
         vm_hosts:
           hosts:
             proxmox-low-energy: { ansible_host: 192.168.1.2, ansible_user: root, ansible_ssh_private_key_file: ~/.ssh/id_rsa }
             local_vm_host: { ansible_host: 127.0.0.1 }
     clients:
       hosts:
-        garage-vr-pc: { ansible_host: 192.168.103.29, mac_address: "34:CF:F6:FB:05:40" }
+        worstation-Stella: { ansible_host: 192.168.30.1, mac_address: "34:CF:F6:FB:05:40" }
+        workstation-garage: { ansible_host: 192.168.30.2, mac_address: '90:DE:80:14:72:43' }
+        macbook-air-Anders: { ansible_host: 192.168.30.3, mac_address: '2C:F0:EE:0F:F4:04' }
+        macbook-air-Stella: { ansible_host: 192.168.30.4, mac_address: '50:ED:3C:40:5C:EC' }
+        macbook-pro-wifi: { ansible_host: 192.168.30.5, mac_address: '00:90:4C:0D:F4:3E' }
+        laptop-gaming-Maya: { ansible_host: 192.168.30.6, mac_address: '20:4E:F6:E6:98:81' }
+        garage-pc-wifi: { ansible_host: 192.168.30.7, mac_address: '34:CF:F6:FB:05:40' }
+        laptop-HP-Anders-jobb: { ansible_host: 192.168.30.8, mac_address: '4C:44:5B:A6:38:76' }
+        kpmg-dator-Sara: { ansible_host: 192.168.30.9, mac_address: '3C:E9:F7:4D:12:7D' }
+    personal_devices:
+      hosts:
+        ipad-Ester: { ansible_host: 192.168.40.1, mac_address: 'A0:4E:A7:A0:B5:F1' }
+        ipad-pro12-stella: { ansible_host: 192.168.40.2, mac_address: 'AE:A4:30:05:53:FD' }
+        phone-Annie-stromgren: { ansible_host: 192.168.40.3, mac_address: 'A2:1E:D8:33:33:76' }
+        phone-Eva-Ericsson: { ansible_host: 192.168.40.4, mac_address: 'F2:61:D6:7B:12:E9' }
+        phone-HUAWEI_P30_Pro: { ansible_host: 192.168.40.5, mac_address: '72:AC:54:E8:01:F0' }
+        phone-iphone-mini-maya: { ansible_host: 192.168.40.6, mac_address: '76:40:56:31:D9:BE' }
+        phone-IphoneSE-Anders-jobb: { ansible_host: 192.168.40.7, mac_address: 'B6:DE:A4:B2:08:49' }
+        phone-jasmin: { ansible_host: 192.168.40.8, mac_address: 'FE:C0:A1:D6:A1:F9' }
+        phone-jasmin2: { ansible_host: 192.168.40.9, mac_address: 'C8:89:F3:9B:E3:C4' }
+        phone-Jimmy-Hedman: { ansible_host: 192.168.40.10, mac_address: '42:DC:D0:00:BA:6C' }
+        phone-jimmy-Hedman-2: { ansible_host: 192.168.40.11, mac_address: 'E6:21:4C:67:08:2E' }
+        phone-Maria-Hedman: { ansible_host: 192.168.40.12, mac_address: '32:BF:38:D7:FD:B9' }
+        phone-Moto-Edge30-Anders: { ansible_host: 192.168.40.13, mac_address: '3E:B5:92:1D:A6:48' }
+        phone-Sara-jobb: { ansible_host: 192.168.40.14, mac_address: 'E2:73:20:01:F9:9C' }
+        phone-Stella-p30: { ansible_host: 192.168.40.15, mac_address: 'EA:F3:F4:48:3F:B1' }
+        phone-Stella-Pixel6: { ansible_host: 192.168.40.16, mac_address: '0E:D9:19:A7:C5:94' }
+        applewatch-Anders: { ansible_host: 192.168.40.17, mac_address: '3A:12:F4:4F:26:01' }
+    smarthome:
+      hosts:
+        alexa-Garage: { ansible_host: 192.168.50.1, mac_address: 'FC:A6:67:DB:FC:0C' }
+        alexa-Kitchen: { ansible_host: 192.168.50.2, mac_address: '00:FC:8B:A9:E8:66' }
+        alexa-Maya: { ansible_host: 192.168.50.3, mac_address: '3C:5C:C4:90:49:D5' }
+        alexa-Stella: { ansible_host: 192.168.50.4, mac_address: '3C:5C:C4:72:75:AC' }
+        audioPro-smartspeaker-kitchen: { ansible_host: 192.168.50.5, mac_address: 'D4:12:43:87:FE:B4' }
+        ring-mothership: { ansible_host: 192.168.50.6, mac_address: 'B0:09:DA:85:6C:3B' }
+        ring-entrance-cam: { ansible_host: 192.168.50.7, mac_address: '5C:47:5E:EC:92:FD' }
+        ring-garage-cam: { ansible_host: 192.168.50.8, mac_address: '5C:47:5E:EC:84:21' }
+        ring-upstairs-cam: { ansible_host: 192.168.50.9, mac_address: '5C:47:5E:EC:84:95' }
+        shelly-button1: { ansible_host: 192.168.50.10, mac_address: '98:CD:AC:2C:27:87' }
+        shelly-plug-car-charger: { ansible_host: 192.168.50.11, mac_address: 'E8:68:E7:6F:34:AE' }
+        shelly-plug-coffemachine: { ansible_host: 192.168.50.12, mac_address: 'E8:68:E7:C1:6A:8B' }
+        shelly-plug-dishwasher: { ansible_host: 192.168.50.13, mac_address: '7C:87:CE:B4:85:E2' }
+        shelly-plug-dryer: { ansible_host: 192.168.50.14, mac_address: 'C8:C9:A3:A5:CC:1A' }
+        shelly-plug-garage-gate: { ansible_host: 192.168.50.15, mac_address: 'E8:68:E7:6F:36:AC' }
+        shelly-plug-laundry-light: { ansible_host: 192.168.50.16, mac_address: 'E8:68:E7:6E:93:67' }
+        tellstick: { ansible_host: 192.168.50.17, mac_address: 'AC:CA:54:02:2F:CB' }
+        shelly-plug-washer-new: { ansible_host: 192.168.50.18, mac_address: '7C:87:CE:B4:A9:6F' }
+        shelly-plug-washer-old: { ansible_host: 192.168.50.19, mac_address: '7C:87:CE:BA:30:E3' }
+        tibber-pulse: { ansible_host: 192.168.50.20, mac_address: 'A0:76:4E:92:45:74' }
+        chromecast-basement: { ansible_host: 192.168.50.21, mac_address: '54:60:09:18:ED:3C' }
+        chromecast-livingroom: { ansible_host: 192.168.50.22, mac_address: '54:60:09:34:5A:1E' }
+        chromecast-ultra1: { ansible_host: 192.168.50.23, mac_address: 'F4:F5:D8:5F:54:64' }
     appliances:
       hosts:
-        Alexa-Garage: { ansible_host: 192.168.101.11, mac_address: 'FC:A6:67:DB:FC:0C' }
-        Alexa-Kitchen: { ansible_host: 192.168.101.12, mac_address: '00:FC:8B:A9:E8:66' }
-        Alexa-Maya: { ansible_host: 192.168.101.13, mac_address: '3C:5C:C4:90:49:D5' }
-        Alexa-stella: { ansible_host: 192.168.101.14, mac_address: '3C:5C:C4:72:75:AC' }
-        Applewatch-Anders: { ansible_host: 192.168.101.15, mac_address: '3A:12:F4:4F:26:01' }
-        AudioPro-smartspeaker-kitchen: { ansible_host: 192.168.101.16, mac_address: 'D4:12:43:87:FE:B4' }
-        chromecast-basement: { ansible_host: 192.168.101.17, mac_address: '54:60:09:18:ED:3C' }
-        chromecast-livingroom: { ansible_host: 192.168.101.18, mac_address: '54:60:09:34:5A:1E' }
-        chromecast-ultra1: { ansible_host: 192.168.101.19, mac_address: 'F4:F5:D8:5F:54:64' }
-        Deco-wifi-basement: { ansible_host: 192.168.101.20, mac_address: '30:DE:4B:BF:BD:D0' }
-        Deco-wifi-M4R-garage: { ansible_host: 192.168.101.21, mac_address: '5C:E9:31:65:A8:F8' }
-        Deco-wifi-upstairs: { ansible_host: 192.168.101.22, mac_address: '30:DE:4B:BF:D4:2C' }
-        Deco-wifi-X60-office: { ansible_host: 192.168.101.23, mac_address: '30:DE:4B:BF:BE:04' }
-        garage-pc-wifi: { ansible_host: 192.168.101.24, mac_address: '34:CF:F6:FB:05:40' }
-        HP-Laptop-Anders-jobb: { ansible_host: 192.168.101.25, mac_address: '4C:44:5B:A6:38:76' }
-        Ipad-Ester: { ansible_host: 192.168.101.26, mac_address: 'A0:4E:A7:A0:B5:F1' }
-        ipad-pro12-stella: { ansible_host: 192.168.101.27, mac_address: 'AE:A4:30:05:53:FD' }
-        Kpmg-dator-sara: { ansible_host: 192.168.101.28, mac_address: '3C:E9:F7:4D:12:7D' }
-        Laptop-gaming-maya: { ansible_host: 192.168.101.29, mac_address: '20:4E:F6:E6:98:81' }
-        Macbook-air-Anders: { ansible_host: 192.168.101.31, mac_address: '2C:F0:EE:0F:F4:04' }
-        Macbook-air-stella: { ansible_host: 192.168.101.32, mac_address: '50:ED:3C:40:5C:EC' }
-        Macbook-pro-wifi: { ansible_host: 192.168.101.33, mac_address: '00:90:4C:0D:F4:3E' }
-        Phone-Annie-stromgren: { ansible_host: 192.168.101.34, mac_address: 'A2:1E:D8:33:33:76' }
-        Phone-Eva-Ericsson: { ansible_host: 192.168.101.35, mac_address: 'F2:61:D6:7B:12:E9' }
-        Phone-HUAWEI_P30_Pro: { ansible_host: 192.168.101.36, mac_address: '72:AC:54:E8:01:F0' }
-        Phone-iphone-mini-maya: { ansible_host: 192.168.101.37, mac_address: '76:40:56:31:D9:BE' }
-        Phone-IphoneSE-Anders-jobb: { ansible_host: 192.168.101.38, mac_address: 'B6:DE:A4:B2:08:49' }
-        phone-jasmin: { ansible_host: 192.168.101.39, mac_address: 'FE:C0:A1:D6:A1:F9' }
-        phone-jasmin2: { ansible_host: 192.168.101.40, mac_address: 'C8:89:F3:9B:E3:C4' }
-        phone-Jimmy-Hedman: { ansible_host: 192.168.101.41, mac_address: '42:DC:D0:00:BA:6C' }
-        Phone-jimmy-Hedman-2: { ansible_host: 192.168.101.42, mac_address: 'E6:21:4C:67:08:2E' }
-        Phone-Maria-Hedman: { ansible_host: 192.168.101.43, mac_address: '32:BF:38:D7:FD:B9' }
-        Phone-Moto-Edge30-Anders: { ansible_host: 192.168.101.44, mac_address: '3E:B5:92:1D:A6:48' }
-        Phone-Sara-jobb: { ansible_host: 192.168.101.45, mac_address: 'E2:73:20:01:F9:9C' }
-        Phone-Stella-p30: { ansible_host: 192.168.101.46, mac_address: 'EA:F3:F4:48:3F:B1' }
-        Phone-Stella-Pixel6: { ansible_host: 192.168.101.47, mac_address: '0E:D9:19:A7:C5:94' }
-        printer-hp-m479-office: { ansible_host: 192.168.101.48, mac_address: '30:24:A9:5A:98:2E' }
-        Ring-basestation: { ansible_host: 192.168.101.49, mac_address: 'B0:09:DA:85:6C:3B' }
-        Ring-entrance-cam: { ansible_host: 192.168.101.50, mac_address: '5C:47:5E:EC:92:FD' }
-        Ring-garage-cam: { ansible_host: 192.168.101.51, mac_address: '5C:47:5E:EC:84:21' }
-        Ring-upstairs-cam: { ansible_host: 192.168.101.52, mac_address: '5C:47:5E:EC:84:95' }
-        shelly-button1: { ansible_host: 192.168.101.53, mac_address: '98:CD:AC:2C:27:87' }
-        shelly-plug-car-charger: { ansible_host: 192.168.101.54, mac_address: 'E8:68:E7:6F:34:AE' }
-        shelly-plug-coffemachine: { ansible_host: 192.168.101.55, mac_address: 'E8:68:E7:C1:6A:8B' }
-        Shelly-plug-dishwasher: { ansible_host: 192.168.101.56, mac_address: '7C:87:CE:B4:85:E2' }
-        Shelly-plug-dryer: { ansible_host: 192.168.101.57, mac_address: 'C8:C9:A3:A5:CC:1A' }
-        shelly-plug-garage-gate: { ansible_host: 192.168.101.58, mac_address: 'E8:68:E7:6F:36:AC' }
-        shelly-plug-laundry-light: { ansible_host: 192.168.101.59, mac_address: 'E8:68:E7:6E:93:67' }
-        tellstick: { ansible_host: 192.168.101.60, mac_address: 'AC:CA:54:02:2F:CB' }
-        Tesla-M3: { ansible_host: 192.168.101.61, mac_address: 'CC:88:26:05:0A:BD' }
-        Tesla-MY: { ansible_host: 192.168.101.62, mac_address: '0C:29:8F:06:C4:A3' }
-        Tibber-pulse: { ansible_host: 192.168.101.63, mac_address: 'A0:76:4E:92:45:74' }
-        Tp-link-unknown: { ansible_host: 192.168.101.64, mac_address: '30:DE:4B:BF:BD:D0' }
-        Voron24: { ansible_host: 192.168.101.65, mac_address: 'E4:5F:01:12:19:4A' }
-        Withings-scale: { ansible_host: 192.168.101.66, mac_address: '00:24:E4:97:6E:74' }
-        Zaptec-car-charger: { ansible_host: 192.168.101.67, mac_address: '8C:4B:14:A9:81:84' }
-        Workstation-Stella: { ansible_host: 192.168.101.68, mac_address: '90:DE:80:14:72:43' }
-        shelly-plug-washer-new: { ansible_host: 192.168.101.69, mac_address: '7C:87:CE:B4:A9:6F' }
-        shelly-plug-washer-old: { ansible_host: 192.168.101.70, mac_address: '7C:87:CE:BA:30:E3' }
+        printer-hp-office: { ansible_host: 192.168.60.1, mac_address: '30:24:A9:5A:98:2E' }
+        tesla-M3: { ansible_host: 192.168.60.2, mac_address: 'CC:88:26:05:0A:BD' }
+        tesla-MY: { ansible_host: 192.168.60.3, mac_address: '0C:29:8F:06:C4:A3' }
+        voron24: { ansible_host: 192.168.60.4, mac_address: 'E4:5F:01:12:19:4A' }
+        withings-scale: { ansible_host: 192.168.60.5, mac_address: '00:24:E4:97:6E:74' }
+        zaptec-car-charger: { ansible_host: 192.168.60.6, mac_address: '8C:4B:14:A9:81:84' }
+    misc:
+      hosts:
+        tp-link-unknown: { ansible_host: 192.168.70.1, mac_address: '30:DE:4B:BF:BD:D0' } # Drugge surface pro?
+        macOS-unknown: { ansible_host: 192.168.70.2, mac_address: 'E6:4F:FD:0E:9B:7A' } # Drugge Ipad / Macbook?
+        iphone-drugge-unknown: { ansible_host: 192.168.70.3, mac_address: 'A6:E3:00:37:0B:E5' }
+        iphone-drugge-unknown2: { ansible_host: 192.168.70.4, mac_address: '3A:C7:4B:04:64:4C' }
+        iphone-drugge-unknown3: { ansible_host: 192.168.70.5, mac_address: 'BE:3B:94:AC:EB:ED' }
+        iphone-drugge-unknown4: { ansible_host: 192.168.70.6, mac_address: '52:41:21:D2:C1:62' }
