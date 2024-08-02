@@ -52,6 +52,8 @@ all:
         phone-Stella-p30: { ansible_host: 192.168.40.15, mac_address: 'EA:F3:F4:48:3F:B1' }
         phone-Stella-Pixel6: { ansible_host: 192.168.40.16, mac_address: '0E:D9:19:A7:C5:94' }
         applewatch-Anders: { ansible_host: 192.168.40.17, mac_address: '3A:12:F4:4F:26:01' }
+        phone-Peter-Drougge: { ansible_host: 192.168.40.18, mac_address: 'D2:2F:5B:A1:93:F7' }
+        phone-Mira-Drougge: { ansible_host: 192.168.70.19, mac_address: '52:41:21:D2:C1:62' }
     smarthome:
       hosts:
         alexa-Garage: { ansible_host: 192.168.50.1, mac_address: 'FC:A6:67:DB:FC:0C' }
@@ -92,4 +94,4 @@ all:
         iphone-drugge-unknown: { ansible_host: 192.168.70.3, mac_address: 'A6:E3:00:37:0B:E5' }
         iphone-drugge-unknown2: { ansible_host: 192.168.70.4, mac_address: '3A:C7:4B:04:64:4C' }
         iphone-drugge-unknown3: { ansible_host: 192.168.70.5, mac_address: 'BE:3B:94:AC:EB:ED' }
-        iphone-drugge-unknown4: { ansible_host: 192.168.70.6, mac_address: '52:41:21:D2:C1:62' }
+
