@@ -24,7 +24,7 @@ all:
             local_vm_host: { ansible_host: 127.0.0.1 }
     clients:
       hosts:
-        worstation-Stella: { ansible_host: 192.168.30.1, mac_address: "34:CF:F6:FB:05:40" }
+        workstation-Stella: { ansible_host: 192.168.30.1, mac_address: "34:CF:F6:FB:05:40" }
         workstation-garage: { ansible_host: 192.168.30.2, mac_address: '90:DE:80:14:72:43' }
         macbook-air-Anders: { ansible_host: 192.168.30.3, mac_address: '2C:F0:EE:0F:F4:04' }
         macbook-air-Stella: { ansible_host: 192.168.30.4, mac_address: '50:ED:3C:40:5C:EC' }
