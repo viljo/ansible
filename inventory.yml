@@ -79,6 +79,6 @@ all:
         Voron24: { ansible_host: 192.168.101.65, mac_address: 'E4:5F:01:12:19:4A' }
         Withings-scale: { ansible_host: 192.168.101.66, mac_address: '00:24:E4:97:6E:74' }
         Zaptec-car-charger: { ansible_host: 192.168.101.67, mac_address: '8C:4B:14:A9:81:84' }
-        Workstation-garage: { ansible_host: 192.168.101.68, mac_address: '90:DE:80:14:72:43' }
+        Workstation-Stella: { ansible_host: 192.168.101.68, mac_address: '90:DE:80:14:72:43' }
         shelly-plug-washer-new: { ansible_host: 192.168.101.69, mac_address: '7C:87:CE:B4:A9:6F' }
         shelly-plug-washer-old: { ansible_host: 192.168.101.70, mac_address: '7C:87:CE:BA:30:E3' }
